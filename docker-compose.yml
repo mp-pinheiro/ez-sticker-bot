@@ -6,3 +6,4 @@ services:
     volumes:
       - ./config.json:/app/config.json
     restart: always
+    user: "${UID}:${GID}"
