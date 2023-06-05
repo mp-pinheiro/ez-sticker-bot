@@ -1,12 +1,14 @@
-FROM jrottenberg/ffmpeg:4.3-ubuntu2004
+FROM python:3.8-slim-buster
 
 RUN apt-get update && \
-    apt-get install -y python3.8 python3-pip && \
+    apt-get install -y build-essential libffi-dev libssl-dev zlib1g-dev libjpeg-dev ffmpeg && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY . /app/
-RUN pip3 install -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["python3.8", "ezstickerbot.py"]
+COPY . .
+
+CMD ["python", "ezstickerbot.py"]
