@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  ezstickerbot:
+    build: .
+    volumes:
+      - ./config.json:/app/config.json
+    restart: always
