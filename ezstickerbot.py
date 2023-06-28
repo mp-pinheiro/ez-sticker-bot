@@ -6,6 +6,7 @@ import re
 import subprocess
 import sys
 import time
+import traceback
 import uuid
 from collections import Counter
 from datetime import datetime
@@ -138,8 +139,15 @@ def validate_chat_id(chat_id):
 def restricted(func):
 
     def wrapper(update, context):
-        chat_id = update.message.chat_id
-        username = update.message.from_user.username
+        # check if inline query
+        # TODO: this is not generic and is a bad wrapper
+        if update.inline_query:
+            chat_id = update.inline_query.from_user.id
+            username = update.inline_query.from_user.username
+        else:
+            chat_id = update.message.chat_id
+            username = update.message.from_user.username
+
         logging.info(f"Received `{func.__name__}` from {username} ({chat_id})")
         if validate_chat_id(chat_id):
             func(update, context)
@@ -333,8 +341,12 @@ def video_received(update: Update, context: CallbackContext):
     # feedback to show bot is processing
     bot.send_chat_action(user_id, 'upload_document')
 
-    document = message.document
-    video_id = document.file_id
+    if message.video:
+        video_id = message.video.file_id
+    else:
+        document = message.document
+        video_id = document.file_id
+
     try:
         logging.info("Downloading video")
         download_path = download_file(video_id)
@@ -1179,8 +1191,8 @@ def handle_error(update: Update, context: CallbackContext):
     if context.error in ("Forbidden: bot was blocked by the user",
                          "Timed out"):
         return
-    logger.warning('Update "{}" caused error "{}"'.format(
-        update, context.error))
+    tb = traceback.format_exc()
+    logger.warning('Update "{}" caused error "{}"'.format(update, tb))
 
 
 def load_lang():
