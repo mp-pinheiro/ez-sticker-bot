@@ -557,7 +557,7 @@ def create_sticker_file(message, image, context: CallbackContext):
 
     # if user is making icon
     if user_data["make_icon"]:
-        image.thumbnail((100, 100), Image.ANTIALIAS)
+        image.thumbnail((100, 100), Image.Resampling.LANCZOS)
         background = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
         background.paste(image, (int(((100 - image.size[0]) / 2)), int(((100 - image.size[1]) / 2))))
         image = background
@@ -579,7 +579,7 @@ def create_sticker_file(message, image, context: CallbackContext):
         else:
             new_height = int(new_height)
 
-        image = image.resize((new_width, new_height), Image.ANTIALIAS)
+        image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
     # save image object to temporary file
     temp_path = os.path.join(temp_dir(), (uuid.uuid4().hex[:6].upper() + ".png"))
